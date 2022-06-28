@@ -1,0 +1,30 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+from sklearn.metrics import adjusted_rand_score
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import re
+doc = pd.read_csv("sample.csv")
+
+documents = np.array(doc)
+print(documents)
+
+vectorizer = TfidfVectorizer(use_idf=True)
+X = vectorizer.fit_transform(documents.ravel())
+print(X)
+from scipy.spatial.distance import pdist, squareform
+from scipy.spatial.distance import cdist
+from Levenshtein import ratio
+matrix = cdist(documents, documents, lambda x,y: ratio(x[0], y[0]))
+df = pd.DataFrame(data=matrix, index=documents, columns=documents)
+df
+from sklearn_extra.cluster import KMedoids
+kmedoids = KMedoids(n_clusters = 6, random_state = 0, metric = 'cosine').fit(df)
+prediction_kmedoids = kmedoids.predict(df)
+#prediction_kmedoids
+from collections import defaultdict
+d_kmedoids = defaultdict(list)
+for i,p in enumerate(prediction_kmedoids):
+    d_kmedoids[p].append(documents[i][0])
+print(d_kmedoids)
